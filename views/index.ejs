@@ -30,8 +30,41 @@
             <a href="<%=url%>" class="btn btn-danger"><span class="fa fa-google-plus"></span> Google</a>
             <% } %>
 
-
         </div>
+        <div class="col-sm-12 col-md-6">
+            <div class="well">
+              <h3 class="text-danger">
+                <span class="fa fa-google-plus"></span> Thay đổi ID thư mục của cả lớp (nếu thay tải khoản)
+              </h3>
+  
+              <% if (rootFolderId) { %>
+              <div class="alert alert-success alert-dismissible">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close"
+                  >×</a
+                >
+                <strong><%= rootFolderId %></strong> Là id của thư mục cả lớp.
+              </div>
+              <%}%>
+              <form action="/rootFolderId" method="POST" enctype="application/x-www-form-urlencoded">
+                <div class="form-group">
+                  <input
+                    class="form-control"
+                    name="rootFolderId"
+                    required
+                    placeholder="ID thư mục của cả lớp"
+                    id=""
+                  />
+                 
+                </div>
+                <div class="form-group">
+                  <button class="btn btn-block btn-danger">
+                    Lưu
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
 
     </div>
 </body>

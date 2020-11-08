@@ -5,18 +5,18 @@ const OAuth2Data = require("./credentials.json");
 const fetch = require('node-fetch');
 const Configstore = require('configstore');
 const packageJson = require('./package.json');
+const Drive = require("./Drive")
+const bodyParser = require('body-parser');
 const config = new Configstore(packageJson.name, {
   foo: 'bar'
 });
-
-config.set("authCode", {
-  "000000": "",
-  "111111": "",
-  "222222": "",
-  "333333": "",
-})
-
-var name, pic
+// config các thư mục của token
+config.set("authToken", {
+  "000000": "luoi_dien",
+  "111111": "de_dieu",
+  "222222": "chay_rung",
+  "333333": "cay_trong"
+});
 
 const {
   google
@@ -24,6 +24,10 @@ const {
 
 const app = express();
 
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 
 const CLIENT_ID = OAuth2Data.web.client_id;
 const CLIENT_SECRET = OAuth2Data.web.client_secret;
@@ -64,28 +68,66 @@ var upload = multer({
   storage: Storage,
 }).single("file"); //Field name and max count
 
+app.post("/rootFolderId", async (req, res) => {
+  let rootFolderId = req.body.rootFolderId;
+  config.set("rootFolderId", rootFolderId);
+  res.redirect('/teacher')
+})
 
+app.get("/getAllImages", async (req, res) => {
+  let token = req.query.token;
+  const drive = new Drive(oAuth2Client);
+  let data = await drive.getAllImages({
+    token
+  });
+  
+  if (data.error) {
+    res.status(data.status).json({
+      message: data.message
+    });
+  } else {
+    res.json(data)
+  }
+})
+app.get("/getAllVideos", async (req, res) => {
+  let token = req.query.token;
+  const drive = new Drive(oAuth2Client);
+  let data = await drive.getAllVideos({
+    token
+  });
+  
+  if (data.error) {
+    res.status(data.status).json({
+      message: data.message
+    });
+  } else {
+    res.json(data)
+  }
+})
 app.get("/teacher", async (req, res) => {
   let currentUser = config.get("currentUser") || {};
+  let rootFolderId = config.get("rootFolderId") || "";
   var url = oAuth2Client.generateAuthUrl({
     access_type: "offline",
     scope: SCOPES,
     prompt: "consent"
   });
   let isLogined = false;
-  if(currentUser.id){
+  if (currentUser.id) {
     isLogined = true;
   }
   res.render("index", {
     url: url,
     currentUser: currentUser.name,
-    isLogined
+    isLogined,
+    rootFolderId
   });
 });
 
 app.get("/", async (req, res) => {
-  let tokens = config.get("currentTokens") || {};
-  
+  const drive = new Drive(oAuth2Client);
+  drive.setQuery("mimeType='application/vnd.google-apps.folder' and name='IT4883-DATA'")
+  await drive.getAllImages();
   if (!authed) {
     res.render("teacherNotAuth");
   } else {
@@ -99,44 +141,42 @@ app.get("/", async (req, res) => {
 });
 
 app.post("/upload", (req, res) => {
-  upload(req, res, function (err) {
+  upload(req, res, async function (err) {
     if (err) {
       console.log(err);
       return res.end("Something went wrong");
     } else {
-      console.log(" req.file.path ",req.file.path);
-      const drive = google.drive({
-        version: "v3",
-        auth: oAuth2Client
-      });
-      const fileMetadata = {
-        name: req.file.filename
-      };
-      const media = {
-        mimeType: req.file.mimetype,
-        body: fs.createReadStream(req.file.path),
-      };
-      
-      drive.files.create({
-          resource: fileMetadata,
-          media: media,
-          fields: "id",
-        },
-        (err, file) => {
-          if (err) {
-            // Handle error
-            console.error(err);
-          } else {
-            fs.unlinkSync(req.file.path);
-            let currentUser = config.get("currentUser") || {};
-            res.render("success", {
-              name: currentUser.name,
-              pic: currentUser.pic,
-              success: true
-            })
-          }
-        }
-      );
+
+
+      // const fileMetadata = {
+      //   name: req.file.filename
+      // };
+      // const media = {
+      //   mimeType: req.file.mimetype,
+      //   body: fs.createReadStream(req.file.path),
+      // };
+
+
+      // drive.files.create({
+      //     resource: fileMetadata,
+      //     media: media,
+      //     fields: "id",
+      //   },
+      //   (err, file) => {
+      //     if (err) {
+      //       // Handle error
+      //       console.error(err);
+      //     } else {
+      //       fs.unlinkSync(req.file.path);
+      //       let currentUser = config.get("currentUser") || {};
+      //       res.render("success", {
+      //         name: currentUser.name,
+      //         pic: currentUser.pic,
+      //         success: true
+      //       })
+      //     }
+      //   }
+      // );
     }
   });
 });
@@ -175,7 +215,7 @@ app.get("/google/callback", function (req, res) {
             let allTokens = config.get("allTokens") || [];
             // lưu trữ tất cả token đã dùng trong hệ thống
             let exist = allTokens.find(item => item.id === response.data.id)
-            if(!exist){
+            if (!exist) {
               allTokens.push({
                 ...tokens,
                 ...response.data || {}
