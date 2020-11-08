@@ -1,69 +1,80 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Node Authentication</title>
-    <link
-      rel="stylesheet"
-      href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"
-    />
-    <style>
-      body {
-        padding-top: 80px;
-        word-wrap: break-word;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <div class="page-header text-center">
-        <h1> IT4483 2020I - App lưu trữ media :)</h1>
+
+<head>
+  <title>Luân Drive</title>
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" />
+  <style>
+    body {
+      padding-top: 80px;
+      word-wrap: break-word;
+    }
+  </style>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <div class="page-header text-center">
+      <h1>IT4483 2020I - App lưu trữ media :)</h1>
+    </div>
+
+    <div class="row">
+      <!-- GOOGLE INFORMATION -->
+      <div class="col-sm-12 col-md-6">
+        <div class="well">
+          <h3 class="text-danger">
+            <span class="fa fa-google-plus"></span> Google
+          </h3>
+
+          <p>
+            <strong>Tên drive</strong>: <%= name %>
+            <br />
+            <img src="<%=pic%>" width="200" height="200" alt="" />
+          </p>
+        </div>
       </div>
 
-      <div class="row">
-        <!-- GOOGLE INFORMATION -->
-        <div class="col-sm-12 col-md-6">
-          <div class="well">
-            <h3 class="text-danger">
-              <span class="fa fa-google-plus"></span> Google
-            </h3>
+      <div class="col-sm-12 col-md-6">
+        <div class="well">
+          <h3 class="text-danger">
+            <span class="fa fa-google-plus"></span> Ví dụ upload file ảnh hoặc videos
+          </h3>
 
-            <p>
-              <strong>Tên drive</strong>: <%= name %>
-              <br />
-              <img src="<%=pic%>" width="200" height="200" alt="" />
-            </p>
-          </div>
-        </div>
-
-        <div class="col-sm-12 col-md-6">
-          <div class="well">
-            <h3 class="text-danger">
-              <span class="fa fa-google-plus"></span> Upload File to Google
-              Drive
-            </h3>
-
-            <% if (success) { %>
-            <div class="alert alert-success alert-dismissible">
-              <a href="#" class="close" data-dismiss="alert" aria-label="close"
-                >×</a
-              >
-              <strong>Success!</strong> Your File is Uploaded.
-            </div>
+          <% if (success) { %>
+          <div class="alert alert-success alert-dismissible">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+            <strong>Success!</strong> Your File is Uploaded. <br />
+            <% if (pic) { %>
+              <a href="<%=pic%>" target="_blank">CLick to view</a>
             <%}%>
-            <form action="/upload" method="POST" >
+             
+          </div>
+          <%}%>
+            <form
+              action="/upload?token=000000&folder=images"
+              method="POST"
+              enctype="multipart/form-data"
+              id="upload_form"
+            >
               <div class="form-group">
-                <input
-                  class="form-control"
-                  name="token"
-                  required
-                  placeholder="token của dự án tương ứng"
-                  id=""
-                />
-                <br/>
+                <div class="form-group">
+                  <label for="token">Token</label>
+                  <select class="form-control" id="token">
+                    <option value="000000"><b>000000</b> Nhóm lưới điện</option>
+                    <option value="111111"><b>111111</b> Nhóm đê điều</option>
+                    <option value="222222"><b>222222</b> Nhóm cháy rừng</option>
+                    <option value="333333"><b>333333</b> Nhóm cây trồng</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="folder">Thư mục</label>
+                  <select class="form-control" id="folder">
+                    <option value="images">Lưu thư mục <b>images</b></option>
+                    <option value="videos">Lưu thư mục <b>videos</b></option>
+                  </select>
+                </div>
                 <input
                   type="file"
                   class="form-control"
@@ -73,7 +84,9 @@
                 />
               </div>
               <div class="form-group">
-                <button class="btn btn-block btn-danger">
+                <button
+                  class="btn btn-block btn-danger"
+                >
                   Upload File
                 </button>
               </div>
@@ -83,9 +96,21 @@
       </div>
     </div>
   </body>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script type="text/javascript">
+    var url = "/upload?token=000000&folder=images";
+    $(document).ready(function () {
+      $("#token").on("click", function () {
+        let token = $(this).val();
+        let folder = $("#folder").val();
+        $("#upload_form").attr("action", `/upload?token=${token}&folder=${folder}`);
+      });
+      $("#folder").on("click", function () {
+        let folder = $(this).val();
+        let token = $("#token").val();
+        $("#upload_form").attr("action", `/upload?token=${token}&folder=${folder}`);
+      });
+    });
+  </script>
+
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 </html>
-
-
-

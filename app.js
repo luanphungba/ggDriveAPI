@@ -80,7 +80,7 @@ app.get("/getAllImages", async (req, res) => {
   let data = await drive.getAllImages({
     token
   });
-  
+
   if (data.error) {
     res.status(data.status).json({
       message: data.message
@@ -95,7 +95,7 @@ app.get("/getAllVideos", async (req, res) => {
   let data = await drive.getAllVideos({
     token
   });
-  
+
   if (data.error) {
     res.status(data.status).json({
       message: data.message
@@ -125,9 +125,6 @@ app.get("/teacher", async (req, res) => {
 });
 
 app.get("/", async (req, res) => {
-  const drive = new Drive(oAuth2Client);
-  drive.setQuery("mimeType='application/vnd.google-apps.folder' and name='IT4883-DATA'")
-  await drive.getAllImages();
   if (!authed) {
     res.render("teacherNotAuth");
   } else {
@@ -135,7 +132,8 @@ app.get("/", async (req, res) => {
     res.render("success", {
       name: currentUser.name,
       pic: currentUser.picture,
-      success: false
+      success: false,
+      uploadedUrl: ""
     });
   }
 });
@@ -146,38 +144,51 @@ app.post("/upload", (req, res) => {
       console.log(err);
       return res.end("Something went wrong");
     } else {
-
-
-      // const fileMetadata = {
-      //   name: req.file.filename
-      // };
-      // const media = {
-      //   mimeType: req.file.mimetype,
-      //   body: fs.createReadStream(req.file.path),
-      // };
-
-
-      // drive.files.create({
-      //     resource: fileMetadata,
-      //     media: media,
-      //     fields: "id",
-      //   },
-      //   (err, file) => {
-      //     if (err) {
-      //       // Handle error
-      //       console.error(err);
-      //     } else {
-      //       fs.unlinkSync(req.file.path);
-      //       let currentUser = config.get("currentUser") || {};
-      //       res.render("success", {
-      //         name: currentUser.name,
-      //         pic: currentUser.pic,
-      //         success: true
-      //       })
-      //     }
-      //   }
-      // );
+      let folder = req.query.folder;
+      let token = req.query.token;
+      if (!["images", "videos"].includes(folder)) {
+        res.status(400).json({
+          message: "Vui lòng gửi thư mục images hoặc videos"
+        });
+      }
+      if(!req.file) {
+        res.status(400).json({
+          message: "Vui lòng gửi kèm file"
+        });
+      }
+      
+      const drive = new Drive(oAuth2Client);
+      const fileMetadata = {
+        name: req.file.filename
+      };
+      const media = {
+        mimeType: req.file.mimetype,
+        body: fs.createReadStream(req.file.path),
+      };
+      let data = await drive.uploadFile({
+        token,
+        folder,
+        fileMetadata,
+        media
+      });
+      
+      if (data.error) {
+        res.status(data.status).json({
+          message: data.message
+        });
+      } else {
+        fs.unlinkSync(req.file.path);
+        let currentUser = config.get("currentUser") || {};
+        res.json({
+          // name: currentUser.name,
+          // pic: currentUser.pic,
+          success: true,
+          image_id: data.id,
+          uploaded_url: `https://drive.google.com/file/d/${data.id}/view`
+        })
+      }
     }
+
   });
 });
 

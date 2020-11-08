@@ -114,6 +114,61 @@ class Drive {
 
         return allFiles;
     }
+    async uploadFile({
+        token,
+        folder,
+        fileMetadata,
+        media
+    }) {
+        let projectFolderId = await this.getProjectFolderId(token) || {};
+        // lỗi auth do sai token
+        if (projectFolderId.error) {
+            return projectFolderId;
+        }
+        let storedFolderId = await this.searchChildFolderByName(projectFolderId, folder);
+        if (storedFolderId) {
+            fileMetadata.parents = [storedFolderId]
+            let [err, result] = await to(this.insertOneFile({
+                fileMetadata,
+                media
+            }))
+            if(err){
+                return {
+                    error: true,
+                    status: 500,
+                    message: err
+                }
+            }
+            return result
+        }
+        return {
+            error: true,
+            status: 500,
+            message: "Không tồn tại thư mục " + folder
+        }
+    }
+
+    async insertOneFile({
+        fileMetadata,
+        media
+    }) {
+
+        return new Promise((resolve, reject) => {
+            this.drive.files.create({
+                    resource: fileMetadata,
+                    media: media,
+                    fields: "id",
+                },
+                (err, res) => {
+                    if (err) {
+                        // Handle error
+                        reject(err)
+                    } else {
+                        resolve(res.data)
+                    }
+                })
+        })
+    }
     async getAllImages({
         token
     }) {
