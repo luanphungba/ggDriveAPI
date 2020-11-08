@@ -178,7 +178,6 @@ app.post("/upload", (req, res) => {
         });
       } else {
         fs.unlinkSync(req.file.path);
-        let currentUser = config.get("currentUser") || {};
         res.json({
           // name: currentUser.name,
           // pic: currentUser.pic,

@@ -47,17 +47,13 @@
             <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
             <strong>Success!</strong> Your File is Uploaded. <br />
             <% if (pic) { %>
-              <a href="<%=pic%>" target="_blank">CLick to view</a>
+            <a href="<%=pic%>" target="_blank">CLick to view</a>
             <%}%>
              
           </div>
           <%}%>
-            <form
-              action="/upload?token=000000&folder=images"
-              method="POST"
-              enctype="multipart/form-data"
-              id="upload_form"
-            >
+            <form action="/upload?token=000000&folder=images" method="POST" enctype="multipart/form-data"
+              id="upload_form">
               <div class="form-group">
                 <div class="form-group">
                   <label for="token">Token</label>
@@ -75,18 +71,10 @@
                     <option value="videos">Lưu thư mục <b>videos</b></option>
                   </select>
                 </div>
-                <input
-                  type="file"
-                  class="form-control"
-                  name="file"
-                  required
-                  id=""
-                />
+                <input type="file" class="form-control" name="file" required id="" />
               </div>
               <div class="form-group">
-                <button
-                  class="btn btn-block btn-danger"
-                >
+                <button class="btn btn-block btn-danger">
                   Upload File
                 </button>
               </div>
@@ -94,23 +82,58 @@
           </div>
         </div>
       </div>
+      <div class="col-sm-12 col-md-6">
+        <div class="well">
+          <p>
+            <strong>Cấu trúc thư mục trong drive</strong>
+            <br />
+            <img src="https://i.imgur.com/4rLOYnr.png" width="100%" height="100%" alt="" />
+          </p>
+        </div>
+      </div>
+      <div class="col-sm-12 col-md-6">
+        <div class="well">
+          <p>
+            <strong>API cung cấp</strong>
+            <br />
+            <h4><b>GET </b>/getAllImages?token=YOUR_GROUP_TOKEN</h4>
+            <p>- API này dùng để lấy tất cả các ảnh ở trong folder của project (lưu trong thư mục images)</p>
+            <h4><b>GET </b>/getAllVideos?token=YOUR_GROUP_TOKEN</h4>
+            <p>- API này dùng để lấy tất cả các videos ở trong folder của project (lưu trong thư mục videos)</p>
+            <h4><b>POST </b>/upload?token=YOUR_GROUP_TOKEN&folder=[images hoặc videos]</h4>
+            <p>- API này dùng để upload videos hoặc ảnh lên project của nhóm</p>
+            <h4>- Token dùng để mình phân biệt thư mục của từng dự án, tránh ông này code dự án này upload lên dự án nọ :)</h4>
+            <h5>Token của nhóm lưới điện là <b>000000</b></h5>
+            <h5>Token của nhóm đê điều là <b>111111</b></h5>
+            <h5>Token của nhóm cháy rừng là <b>222222</b></h5>
+            <h5>Token của nhóm cây trồng là <b>333333</b></h5>
+            
+            <h4>- Folder để lưu thì chỉ lưu 2 folders: images cho ảnh và videos cho videos :)</h4>
+          </p>
+        </div>
+      </div>
     </div>
-  </body>
-  <script type="text/javascript">
-    var url = "/upload?token=000000&folder=images";
-    $(document).ready(function () {
-      $("#token").on("click", function () {
-        let token = $(this).val();
-        let folder = $("#folder").val();
-        $("#upload_form").attr("action", `/upload?token=${token}&folder=${folder}`);
-      });
-      $("#folder").on("click", function () {
-        let folder = $(this).val();
-        let token = $("#token").val();
-        $("#upload_form").attr("action", `/upload?token=${token}&folder=${folder}`);
-      });
+    <div class="row">
+      <!-- GOOGLE INFORMATION -->
+      
+    </div>
+</body>
+<script type="text/javascript">
+  var url = "/upload?token=000000&folder=images";
+  $(document).ready(function () {
+    $("#token").on("click", function () {
+      let token = $(this).val();
+      let folder = $("#folder").val();
+      $("#upload_form").attr("action", `/upload?token=${token}&folder=${folder}`);
     });
-  </script>
+    $("#folder").on("click", function () {
+      let folder = $(this).val();
+      let token = $("#token").val();
+      $("#upload_form").attr("action", `/upload?token=${token}&folder=${folder}`);
+    });
+  });
+</script>
 
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+
 </html>
