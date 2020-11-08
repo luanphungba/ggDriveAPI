@@ -22,7 +22,6 @@ class Drive {
 
     // Search folder của từng dự án
     searchChildFolderByName(parentId, folderName) {
-
         return new Promise((resolve, reject) => {
             this.drive.files.list({
                 q: `'${parentId}' in parents and mimeType='application/vnd.google-apps.folder' and name='${folderName}'`,
@@ -32,7 +31,8 @@ class Drive {
                 if (err) {
                     reject(err);
                 } else {
-                    let folder = _.get(res, "data.files[0].id", "")
+                    let folder = _.get(res, "data.files[0].id", "");
+                    console.log("folder ", folder)
                     resolve(folder)
                 }
             });
@@ -66,9 +66,11 @@ class Drive {
                 status: 401
             };
         }
+        
         let rootFolderId = config.get("rootFolderId")
         // get ra folder của dự án
         let [error, projectFolderId] = await to(this.searchChildFolderByName(rootFolderId, folderName));
+        
         if (error) {
             return {
                 error: true,
@@ -120,11 +122,17 @@ class Drive {
         fileMetadata,
         media
     }) {
-        let projectFolderId = await this.getProjectFolderId(token) || {};
+        let [tokenErr, projectFolderId] = await to(this.getProjectFolderId(token));
+        console.log("tokenErr ", tokenErr)
         // lỗi auth do sai token
-        if (projectFolderId.error) {
-            return projectFolderId;
+        if (tokenErr) {
+            return {
+                error: true,
+                status: 500,
+                message: tokenErr
+            };
         }
+        
         let storedFolderId = await this.searchChildFolderByName(projectFolderId, folder);
         if (storedFolderId) {
             fileMetadata.parents = [storedFolderId]

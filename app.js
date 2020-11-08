@@ -51,7 +51,7 @@ if (tokens.refresh_token) {
 
 // If modifying these scopes, delete token.json.
 const SCOPES =
-  "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.profile";
+  "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.profile  https://www.googleapis.com/auth/drive.metadata";
 
 app.set("view engine", "ejs");
 
@@ -165,6 +165,7 @@ app.post("/upload", (req, res) => {
         mimeType: req.file.mimetype,
         body: fs.createReadStream(req.file.path),
       };
+      
       let data = await drive.uploadFile({
         token,
         folder,
@@ -178,12 +179,13 @@ app.post("/upload", (req, res) => {
         });
       } else {
         fs.unlinkSync(req.file.path);
+        let currentUser = config.get("currentUser") || {};
         res.json({
-          // name: currentUser.name,
-          // pic: currentUser.pic,
+          name: currentUser.name,
+          pic: currentUser.pic,
           success: true,
           image_id: data.id,
-          uploaded_url: `https://drive.google.com/file/d/${data.id}/view`
+          uploadedUrl: `https://drive.google.com/file/d/${data.id}/view`
         })
       }
     }
