@@ -36,6 +36,15 @@ const oAuth2Client = new google.auth.OAuth2(
 );
 var authed = false;
 
+let tokens = config.get("currentTokens") || {};
+
+if (tokens.refresh_token) {
+  oAuth2Client.setCredentials({
+    refresh_token: tokens.refresh_token
+  });
+  authed = true;
+}
+
 // If modifying these scopes, delete token.json.
 const SCOPES =
   "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.profile";
@@ -43,9 +52,9 @@ const SCOPES =
 app.set("view engine", "ejs");
 
 var Storage = multer.diskStorage({
-  destination: function (req, file, callback) {
-    callback(null, "./images");
-  },
+  // destination: function (req, file, callback) {
+  //   callback(null, "./images");
+  // },
   filename: function (req, file, callback) {
     callback(null, file.fieldname + "_" + Date.now() + "_" + file.originalname);
   },
@@ -77,14 +86,9 @@ app.get("/teacher", async (req, res) => {
 app.get("/", async (req, res) => {
   let tokens = config.get("currentTokens") || {};
   
-  let refresh_token = tokens.refresh_token;
-
-  if (!refresh_token) {
+  if (!authed) {
     res.render("teacherNotAuth");
   } else {
-    oAuth2Client.setCredentials({
-      refresh_token: tokens.refresh_token
-    });
     let currentUser = config.get("currentUser") || {}
     res.render("success", {
       name: currentUser.name,
@@ -100,13 +104,13 @@ app.post("/upload", (req, res) => {
       console.log(err);
       return res.end("Something went wrong");
     } else {
-      console.log(req.file.path);
+      console.log(" req.file.path ",req.file.path);
       const drive = google.drive({
         version: "v3",
         auth: oAuth2Client
       });
       const fileMetadata = {
-        name: req.file.filename,
+        name: req.file.filename
       };
       const media = {
         mimeType: req.file.mimetype,
@@ -140,6 +144,7 @@ app.post("/upload", (req, res) => {
 app.get('/logout', (req, res) => {
   config.delete("currentUser");
   config.delete("currentTokens");
+  authed = false;
   res.redirect('/teacher')
 })
 
@@ -154,7 +159,7 @@ app.get("/google/callback", function (req, res) {
       } else {
         console.log("Successfully authenticated");
         config.set("currentTokens", tokens);
-
+        authed = true;
         oAuth2Client.setCredentials(tokens);
 
         var oauth2 = google.oauth2({
