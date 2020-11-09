@@ -129,11 +129,13 @@ app.get("/", async (req, res) => {
     res.render("teacherNotAuth");
   } else {
     let currentUser = config.get("currentUser") || {}
+    let rootFolderId = config.get("rootFolderId");
     res.render("success", {
       name: currentUser.name,
       pic: currentUser.picture,
       success: false,
-      uploadedUrl: ""
+      uploadedUrl: "",
+      rootFolderId
     });
   }
 });
@@ -180,11 +182,13 @@ app.post("/upload", (req, res) => {
       } else {
         fs.unlinkSync(req.file.path);
         let currentUser = config.get("currentUser") || {};
+        let rootFolderId = config.get("rootFolderId");
         res.json({
           name: currentUser.name,
           pic: currentUser.pic,
           success: true,
           image_id: data.id,
+          rootFolderId,
           uploadedUrl: `https://drive.google.com/file/d/${data.id}/view`
         })
       }

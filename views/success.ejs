@@ -31,6 +31,10 @@
           <p>
             <strong>Tên drive</strong>: <%= name %>
             <br />
+            <% if (pic) { %>
+              <strong>Link Drive: </strong>: <a href = "https://drive.google.com/drive/u/1/folders/<%= rootFolderId %>" target="_blank">https://drive.google.com/drive/u/1/folders/<%= rootFolderId %></a>
+              <%}%>
+            <br />
             <img src="<%=pic%>" width="200" height="200" alt="" />
           </p>
         </div>
@@ -103,10 +107,10 @@
             <h4><b>POST </b>/upload?token=YOUR_GROUP_TOKEN&folder=[images hoặc videos]</h4>
             <p>- API này dùng để upload videos hoặc ảnh lên project của nhóm</p>
             <h4>- Token dùng để mình phân biệt thư mục của từng dự án, tránh ông này code dự án này upload lên dự án nọ :)</h4>
-            <h5>Token của nhóm lưới điện là <b>000000</b></h5>
-            <h5>Token của nhóm đê điều là <b>111111</b></h5>
-            <h5>Token của nhóm cháy rừng là <b>222222</b></h5>
-            <h5>Token của nhóm cây trồng là <b>333333</b></h5>
+            <h5>--- Token của nhóm lưới điện là <b>000000</b></h5>
+            <h5>--- Token của nhóm đê điều là <b>111111</b></h5>
+            <h5>--- Token của nhóm cháy rừng là <b>222222</b></h5>
+            <h5>--- Token của nhóm cây trồng là <b>333333</b></h5>
             
             <h4>- Folder để lưu thì chỉ lưu 2 folders: images cho ảnh và videos cho videos :)</h4>
           </p>
