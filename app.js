@@ -191,7 +191,7 @@ app.post("/upload", (req, res) => {
           success: true,
           image_id: data.id,
           rootFolderId,
-          uploadedUrl: `https://drive.google.com/file/d/${data.id}/view`
+          uploadedUrl: `https://drive.google.com/uc?id=${data.id}`
         })
       }
     }
