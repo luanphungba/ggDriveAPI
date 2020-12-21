@@ -10,6 +10,8 @@ const bodyParser = require('body-parser');
 const config = new Configstore(packageJson.name, {
   foo: 'bar'
 });
+var cors = require('cors')
+
 // config các thư mục của token
 config.set("authToken", {
   "000000": "luoi_dien",
@@ -23,7 +25,7 @@ const {
 } = require("googleapis");
 
 const app = express();
-
+app.use(cors())
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: true
